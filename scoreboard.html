@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Brazil vs India Live Scoreboard</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:#0b1220;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#fff;min-height:100vh;overflow-x:hidden}
+body.clear{background:transparent}
+#sb{position:fixed;top:14px;left:14px;z-index:5;font-weight:800}
+.bar{display:flex;align-items:stretch;background:#111827;border-radius:12px;overflow:hidden;box-shadow:0 6px 24px #0008;border:1px solid #ffffff22}
+.tm{display:flex;align-items:center;gap:8px;padding:8px 12px;font-size:18px;letter-spacing:1px}
+.chip{width:12px;height:30px;border-radius:4px}
+.sc{background:#fff;color:#111;min-width:38px;text-align:center;font-size:26px;padding:4px 8px;display:flex;align-items:center;justify-content:center}
+.sc.pop{animation:pop .8s}
+@keyframes pop{0%{transform:scale(1)}30%{transform:scale(1.7);background:#ffdf00}100%{transform:scale(1)}}
+.clk{background:#1f2937;padding:8px 12px;font-size:16px;display:flex;align-items:center;gap:6px;font-variant-numeric:tabular-nums}
+.live{width:8px;height:8px;border-radius:50%;background:#ef4444;animation:bl 1.2s infinite}
+@keyframes bl{50%{opacity:.2}}
+#toast{margin-top:10px;display:flex;flex-direction:column;gap:8px}
+.t{display:flex;align-items:center;gap:12px;padding:10px 16px 10px 12px;border-radius:12px;color:#fff;box-shadow:0 8px 28px #000a;animation:in .5s cubic-bezier(.2,1.4,.4,1) both;max-width:min(92vw,380px)}
+.t.out{animation:outa .45s ease-in both}
+@keyframes in{from{transform:translateX(-120%) scale(.8);opacity:0}to{transform:none;opacity:1}}
+@keyframes outa{to{transform:translateX(-120%);opacity:0}}
+.t .ic{font-size:34px;animation:wob 1s infinite}
+@keyframes wob{50%{transform:rotate(-14deg) scale(1.15)}}
+.t b{display:block;font-size:12px;letter-spacing:2px;opacity:.9}
+.t strong{display:block;font-size:22px;line-height:1.15}
+.t small{font-size:13px;opacity:.9}
+.t.goal{background:linear-gradient(90deg,#16a34a,#facc15);color:#111;animation:in .5s cubic-bezier(.2,1.4,.4,1) both,glow 1s 3}
+.t.goal strong{font-size:28px}
+@keyframes glow{50%{box-shadow:0 0 40px 10px #facc15}}
+.t.yellow{background:#eab308;color:#111}
+.t.red{background:#dc2626}
+.t.sub{background:#2563eb}
+.t.info{background:#374151}
+.p{position:fixed;width:8px;height:8px;border-radius:2px;z-index:4;pointer-events:none;animation:fly 1.4s ease-out forwards}
+@keyframes fly{to{transform:translate(var(--dx),var(--dy)) rotate(540deg);opacity:0}}
+#flash{position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 15% 10%,#facc15aa,transparent 55%);opacity:0;z-index:3}
+#flash.on{animation:fl 1.2s}
+@keyframes fl{0%{opacity:1}100%{opacity:0}}
+#tg{position:fixed;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:9;background:#111827;color:#fff;border:1px solid #fff3;border-radius:50%;width:44px;height:44px;font-size:20px;cursor:pointer}
+#cp{position:fixed;right:12px;bottom:calc(64px + env(safe-area-inset-bottom,0px));z-index:8;width:min(94vw,340px);max-height:75vh;overflow:auto;background:#111827ee;border:1px solid #fff3;border-radius:14px;padding:12px;display:none}
+#cp.show{display:block}
+#cp h4{margin:10px 0 6px;font-size:12px;letter-spacing:1px;opacity:.7}
+#cp input,#cp select{width:100%;padding:9px;border-radius:8px;border:1px solid #fff3;background:#1f2937;color:#fff;font-size:15px;margin-bottom:6px}
+.g{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+button.b{padding:10px;border:0;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;color:#fff;background:#374151}
+button.b.gr{background:#16a34a}button.b.ye{background:#eab308;color:#111}button.b.rd{background:#dc2626}button.b.bl{background:#2563eb}
+#log{font-size:12px;opacity:.85;margin-top:6px;line-height:1.5}
+</style></head><body>
+<div id="flash"></div>
+<div id="sb">
+  <div class="bar">
+    <div class="tm"><span class="chip" style="background:linear-gradient(#009c3b,#ffdf00)"></span>BRA</div>
+    <div class="sc" id="sb1">0</div>
+    <div class="sc" id="sb2">0</div>
+    <div class="tm">IND<span class="chip" style="background:linear-gradient(#ff9933,#138808)"></span></div>
+    <div class="clk"><span class="live"></span><span id="hf">1H</span> <span id="ck">00:00</span></div>
+  </div>
+  <div id="toast"></div>
+</div>
+<button id="tg" title="Controls (C)">⚙️</button>
+<div id="cp">
+  <h4>EVENT</h4>
+  <select id="team"><option value="b">Brazil 🇧🇷</option><option value="i">India 🇮🇳</option></select>
+  <input id="pl" placeholder="Player name (e.g. Vinícius Jr)">
+  <input id="pl2" placeholder="Player coming ON (for substitution)">
+  <div class="g">
+    <button class="b gr" data-e="goal">⚽ Goal</button>
+    <button class="b ye" data-e="yellow">🟨 Yellow</button>
+    <button class="b rd" data-e="red">🟥 Red</button>
+    <button class="b bl" data-e="sub">🔁 Sub</button>
+    <button class="b" data-e="pen">🎯 Penalty</button>
+    <button class="b" data-e="var">📺 VAR</button>
+    <button class="b" data-e="own">😬 Own goal</button>
+    <button class="b" data-e="undo">↩ Undo goal</button>
+  </div>
+  <h4>CLOCK</h4>
+  <div class="g">
+    <button class="b gr" id="run">▶ Start / ⏸ Pause</button>
+    <button class="b" id="half">Half: 1H</button>
+    <input id="setm" type="number" placeholder="Set minute">
+    <button class="b" id="setb">Set</button>
+  </div>
+  <button class="b" id="bg" style="width:100%;margin-top:6px">Toggle transparent bg (for OBS)</button>
+  <h4>LOG</h4><div id="log"></div>
+</div>
+<script>
+var S={b:0,i:0,sec:0,run:false,half:'1H'},N={b:'BRAZIL',i:'INDIA'},Q=[],busy=false,LG=[];
+var $=function(x){return document.getElementById(x)};
+function mm(){return Math.floor(S.sec/60)+(S.half==='2H'?0:0)}
+function draw(){var m=Math.floor(S.sec/60),s=S.sec%60;$('ck').textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;$('hf').textContent=S.half;$('sb1').textContent=S.b;$('sb2').textContent=S.i}
+setInterval(function(){if(S.run){S.sec++;draw()}},1000);
+function confetti(){var cols=['#facc15','#16a34a','#fff','#ff9933','#2563eb'];for(var k=0;k<36;k++){var e=document.createElement('i');e.className='p';e.style.left=(40+Math.random()*80)+'px';e.style.top=(30+Math.random()*30)+'px';e.style.background=cols[k%5];e.style.setProperty('--dx',(Math.random()*340-40)+'px');e.style.setProperty('--dy',(Math.random()*300-40)+'px');document.body.appendChild(e);setTimeout(function(x){x.remove()}.bind(null,e),1500)}}
+var CFG={goal:['⚽','GOAL!','goal',5500],pen:['🎯','PENALTY SCORED!','goal',5500],own:['😬','OWN GOAL','red',5000],yellow:['🟨','YELLOW CARD','yellow',4200],red:['🟥','RED CARD','red',4800],sub:['🔁','SUBSTITUTION','sub',4800],var:['📺','VAR CHECK','info',4200]};
+function show(ev){var c=CFG[ev.t],d=document.createElement('div');d.className='t '+c[2];
+var line=ev.t==='sub'?'<small>⬇ '+esc(ev.n||'Player')+'</small><br><small>⬆ '+esc(ev.n2||'Player')+'</small>':'<strong>'+esc(ev.n||'')+'</strong>';
+d.innerHTML='<span class="ic">'+c[0]+'</span><div><b>'+c[1]+' · '+N[ev.team]+'</b>'+line+'<small>'+ev.m+"'</small></div>";
+$('toast').appendChild(d);
+if(ev.t==='goal'||ev.t==='pen'||ev.t==='own'){var el=$(ev.scoreEl);el.classList.remove('pop');void el.offsetWidth;el.classList.add('pop');if(ev.t!=='own'||true){$('flash').classList.remove('on');void $('flash').offsetWidth;$('flash').classList.add('on');confetti()}}
+setTimeout(function(){d.classList.add('out');setTimeout(function(){d.remove();busy=false;next()},450)},c[3])}
+function next(){if(busy||!Q.length)return;busy=true;show(Q.shift())}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function fire(t){var team=$('team').value,n=$('pl').value.trim(),n2=$('pl2').value.trim(),m=Math.max(1,Math.floor(S.sec/60)+1);
+if(t==='undo'){if(S[team]>0){S[team]--;draw();log('↩ Goal removed ('+N[team]+')')}return}
+var scorer=team;if(t==='own'){scorer=team==='b'?'i':'b'}
+if(t==='goal'||t==='pen'||t==='own'){S[scorer]++;draw()}
+var ev={t:t,team:team,n:n,n2:n2,m:m,scoreEl:scorer==='b'?'sb1':'sb2'};Q.push(ev);next();
+log(m+"' "+CFG[t][1]+' '+N[team]+(n?' – '+n:'')+(t==='sub'&&n2?' ⇄ '+n2:''));
+$('pl').value='';$('pl2').value=''}
+function log(s){LG.unshift(s);LG=LG.slice(0,6);$('log').innerHTML=LG.map(esc).join('<br>')}
+document.querySelectorAll('[data-e]').forEach(function(b){b.onclick=function(){fire(b.dataset.e)}});
+$('run').onclick=function(){S.run=!S.run};
+$('half').onclick=function(){S.half=S.half==='1H'?'2H':S.half==='2H'?'ET':'1H';$('half').textContent='Half: '+S.half;draw()};
+$('setb').onclick=function(){var v=parseInt($('setm').value,10);if(!isNaN(v)){S.sec=v*60;draw()}};
+$('bg').onclick=function(){document.body.classList.toggle('clear')};
+$('tg').onclick=function(){$('cp').classList.toggle('show')};
+document.addEventListener('keydown',function(e){if(e.target.tagName==='INPUT')return;if(e.key==='c'||e.key==='C')$('cp').classList.toggle('show');if(e.key===' '){e.preventDefault();S.run=!S.run}});
+if(location.hash==='#obs'){document.body.classList.add('clear');$('tg').style.opacity=.15}
+draw();
+</script></body></html>
